@@ -2,16 +2,43 @@ package WebFrame
 
 import (
 	"bufio"
+	"io"
 	"net/http"
 )
 
 type Context struct {
 	RespWriter http.ResponseWriter
 	Request    *http.Request
-	IO         *bufio.ReadWriter
+	IO         *bufio.ReadWriter // reader from body and writer to conn
 	Headers    http.Header
 	Cookies    []*http.Cookie
 	RemoteAddr string
+}
+
+func (this *Context) WriteIO(b []byte) (int, error) {
+	i, err := this.IO.Write(b)
+	this.IO.Flush()
+	return i, err
+}
+func (this *Context) WriteByteIO(b byte) error {
+	err := this.IO.WriteByte(b)
+	this.IO.Flush()
+	return err
+}
+func (this *Context) WriteRuneIO(r rune) (int, error) {
+	i, err := this.IO.WriteRune(r)
+	this.IO.Flush()
+	return i, err
+}
+func (this *Context) WriteStringIO(s string) (int, error) {
+	i, err := this.IO.WriteString(s)
+	this.IO.Flush()
+	return i, err
+}
+func (this *Context) WriteToIO(w io.Writer) (int64, error) {
+	i, err := this.IO.WriteTo(w)
+	this.IO.Flush()
+	return i, err
 }
 
 func (this *Context) SetCookie(c http.Cookie) {
@@ -40,9 +67,11 @@ type Handler func(*Context)
 func HandleHTTP(h Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// .. get
-		rio := bufio.NewReader(r)
+		rio := bufio.NewReader(r.Body)
 		wio := bufio.NewWriter(w)
+		// log.Println("ACTIVE")
 		c := Context{RespWriter: w, Request: r, IO: bufio.NewReadWriter(rio, wio), Headers: r.Header, Cookies: r.Cookies(), RemoteAddr: r.RemoteAddr}
+		// log.Println(c.IO)
 		h(&c)
 
 		// w, r = UpgradeContext(&c)
