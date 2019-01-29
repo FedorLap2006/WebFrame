@@ -17,7 +17,7 @@ type Context struct {
 }
 
 func (this* Context) GetPage(filename string,ldelim byte,rdelim byte) (*template.Template){
-	tmp := template.New().Delims(ldelim,rdelim).ParseFiles(filename)
+	tmp := template.New("").Delims(ldelim,rdelim).ParseFiles(filename)
 	return tmp
 }
 
