@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"net/http"
+	"html/template"
 )
 
 type Context struct {
@@ -13,6 +14,11 @@ type Context struct {
 	Headers    http.Header
 	Cookies    []*http.Cookie
 	RemoteAddr string
+}
+
+func (this* Context) GetPage(filename string,ldelim byte,rdelim byte) (*template.Template){
+	tmp := template.New().Delims(ldelim,rdelim).ParseFiles(filename)
+	return tmp
 }
 
 func (this *Context) WriteIO(b []byte) (int, error) {
