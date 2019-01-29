@@ -16,8 +16,8 @@ type Context struct {
 	RemoteAddr string
 }
 
-func (this* Context) GetPage(mfile string, filename ...string,ldelim string,rdelim string,exec bool) (*template.Template,error){
-	tmp,err := template.New("").Delims(ldelim,rdelim).ParseFiles(mfile,filename...)
+func (this* Context) GetPage(ldelim string,rdelim string,exec bool,filename ...string) (*template.Template,error){
+	tmp,err := template.New("").Delims(ldelim,rdelim).ParseFiles(filename...)
 	return tmp,err
 }
 
