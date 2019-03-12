@@ -1,4 +1,5 @@
-package Go
+// package Go
+package WebFrame
 
 import (
 	"bufio"
